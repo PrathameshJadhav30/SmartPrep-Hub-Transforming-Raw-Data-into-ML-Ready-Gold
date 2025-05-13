@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import datetime
 from sklearn.preprocessing import LabelEncoder, StandardScaler, MinMaxScaler
 
 def remove_outliers(df, numerical_columns):
@@ -16,10 +17,10 @@ def Preprocessing(df, missing_option, encoding_method, scaling_method, outlier_r
     if df.empty:
         st.error("The uploaded CSV file is empty. Please upload a valid file.")
         return None
-    
+
     # Remove Duplicates
     df.drop_duplicates(inplace=True)
-    
+
     # Handle Missing Values
     try:
         if missing_option == "Drop Rows":
@@ -33,7 +34,7 @@ def Preprocessing(df, missing_option, encoding_method, scaling_method, outlier_r
     except Exception as e:
         st.error(f"Error handling missing values: {e}")
         return None
-    
+
     # Encoding Categorical Variables
     categorical_columns = df.select_dtypes(include=['object']).columns.tolist()
     if categorical_columns:
@@ -46,7 +47,7 @@ def Preprocessing(df, missing_option, encoding_method, scaling_method, outlier_r
         except Exception as e:
             st.error(f"Encoding error: {e}")
             return None
-    
+
     # Scaling Numerical Features
     numerical_columns = df.select_dtypes(include=['int64', 'float64']).columns.tolist()
     if numerical_columns:
@@ -58,48 +59,53 @@ def Preprocessing(df, missing_option, encoding_method, scaling_method, outlier_r
         except Exception as e:
             st.error(f"Scaling error: {e}")
             return None
-    
+
     # Outlier Removal
     if outlier_removal:
         df = remove_outliers(df, numerical_columns)
-    
+
     return df
 
 def CSVPreprocessing():
     st.markdown("""<h1 style='color:#87CEEB;'>🚀 Automated Data Preprocessing </h1>""", unsafe_allow_html=True)
-    
+
     st.markdown("""
     - Upload your CSV file for automatic **data cleaning, encoding, and scaling**.
     - Customize preprocessing options for missing values, outliers, and scaling.
     """)
-    
+
     uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
-    
+
     if uploaded_file is not None:
         try:
             df = pd.read_csv(uploaded_file)
             st.write("### Preview of Uploaded Data")
             st.write(df.head())
-            
+
             missing_option = st.selectbox("Choose a method to handle missing values:", 
                                           ["Drop Rows", "Fill with Mean", "Fill with Median", "Fill with Mode"], index=1)
             encoding_method = st.selectbox("Choose encoding method:", ["Label Encoding", "One-Hot Encoding"])
             scaling_method = st.selectbox("Choose a scaling method:", ["StandardScaler", "MinMaxScaler"])
             outlier_removal = st.checkbox("Remove Outliers using IQR method")
-            
+
             processed_df = Preprocessing(df, missing_option, encoding_method, scaling_method, outlier_removal)
-            
+
             if processed_df is not None:
                 st.write("### Data After Preprocessing:")
+
+                # Add signature column
+                signature_value = f"Processed_by_Streamlit_Preprocessor_v1.0_on_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
+                processed_df["__processed_signature__"] = signature_value
+
                 st.write(processed_df.head())
-                
+
                 @st.cache_data
                 def convert_df_to_csv(df):
                     return df.to_csv(index=False).encode('utf-8')
-                
+
                 processed_csv = convert_df_to_csv(processed_df)
                 st.download_button(label="Download Processed CSV", data=processed_csv, file_name="processed_data.csv", mime="text/csv")
-        
+
         except Exception as e:
             st.error(f"An error occurred: {e}")
 

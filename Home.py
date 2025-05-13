@@ -17,7 +17,7 @@ def Home():
     """, unsafe_allow_html=True)
     
     # Introduction
-    st.markdown("<h1 class='main-title'>Dataset Doctor: Advanced Preprocessing Techniques  </h1>", unsafe_allow_html=True)
+    st.markdown("<h1 class='main-title'>SmartPrep Hub -Transforming Raw Data into ML-Ready Gold </h1>", unsafe_allow_html=True)
     st.markdown("<h2 class='sub-title'>Hello, I am <span class='highlight'>Prathamesh Jadhav</span> 👋</h2>", unsafe_allow_html=True)
     st.write("""
     Data preprocessing is a crucial step in any machine learning pipeline. Raw data often contains inconsistencies such as 

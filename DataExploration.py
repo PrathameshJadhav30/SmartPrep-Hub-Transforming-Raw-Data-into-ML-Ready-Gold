@@ -1,12 +1,13 @@
 import streamlit as st
 import pandas as pd
-import io  # Import StringIO for capturing df.info() output
+import io
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, LabelEncoder, RobustScaler
 from scipy import stats
 from sklearn.decomposition import PCA
+import datetime  # ✅ Added for timestamp in signature
 
 def DataExploration():
     st.markdown("""<h1 style='color:#87CEEB;'>Data Exploration </h1>""", unsafe_allow_html=True)
@@ -45,7 +46,6 @@ def DataExploration():
         st.write("### Column Names")
         st.write(df.columns.tolist())
 
-        # Handling Missing Values
         if st.checkbox("Fill Missing Values with Mean/Mode/Median"):
             fill_method = st.radio("Select Method", ("Mean", "Median", "Mode"))
             for col in df.select_dtypes(include=[np.number]).columns:
@@ -57,12 +57,10 @@ def DataExploration():
                     df[col].fillna(df[col].mode()[0], inplace=True)
             st.success("Missing values handled successfully.")
 
-        # Handling Duplicates
         if st.checkbox("Remove Duplicate Rows"):
             df.drop_duplicates(inplace=True)
             st.success("Duplicate rows removed successfully.")
 
-        # Scaling Features
         if st.checkbox("Apply Feature Scaling"):
             scaler_option = st.radio("Select Scaling Method", ("StandardScaler", "MinMaxScaler", "RobustScaler"))
             scaler = StandardScaler() if scaler_option == "StandardScaler" else MinMaxScaler() if scaler_option == "MinMaxScaler" else RobustScaler()
@@ -70,27 +68,23 @@ def DataExploration():
             df[num_cols] = scaler.fit_transform(df[num_cols])
             st.success("Feature scaling applied successfully.")
 
-        # Encoding Categorical Variables
         if st.checkbox("Apply Label Encoding to Categorical Features"):
             cat_cols = df.select_dtypes(include=["object"]).columns
             for col in cat_cols:
                 df[col] = LabelEncoder().fit_transform(df[col])
             st.success("Categorical encoding applied successfully.")
 
-        # Removing Outliers
         if st.checkbox("Remove Outliers using Z-Score"):
             threshold = st.slider("Select Z-Score threshold", 1.0, 5.0, 3.0)
             df = df[(np.abs(stats.zscore(df.select_dtypes(include=[np.number]))) < threshold).all(axis=1)]
             st.success("Outliers removed successfully.")
 
-        # Feature Selection
         if st.checkbox("Remove Low Variance Features"):
             variance_threshold = st.slider("Select Variance Threshold", 0.0, 0.1, 0.01)
             low_variance_cols = df.var()[df.var() < variance_threshold].index.tolist()
             df.drop(columns=low_variance_cols, inplace=True)
             st.success("Low variance features removed successfully.")
 
-        # Principal Component Analysis (PCA)
         if st.checkbox("Apply PCA for Dimensionality Reduction"):
             n_components = st.slider("Select Number of Components", 1, min(df.shape[1], 5), 2)
             pca = PCA(n_components=n_components)
@@ -98,7 +92,6 @@ def DataExploration():
             df = pd.DataFrame(df_pca, columns=[f"PC{i+1}" for i in range(n_components)])
             st.success("PCA applied successfully.")
 
-        # Date-Time Feature Extraction
         if st.checkbox("Extract Features from Date-Time Columns"):
             datetime_cols = df.select_dtypes(include=["datetime", "object"]).columns
             selected_col = st.selectbox("Select Date-Time Column", datetime_cols)
@@ -109,7 +102,10 @@ def DataExploration():
             df.drop(columns=[selected_col], inplace=True)
             st.success("Date-time features extracted successfully.")
 
-        # Download Processed Dataset
+        # ✅ Add Signature Column Before Download
+        signature = f"Processed_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
+        df["__processed_signature__"] = signature
+
         st.write("### Download Processed Dataset")
         processed_file = df.to_csv(index=False).encode('utf-8')
         st.download_button("Download CSV", processed_file, "processed_dataset.csv", "text/csv")
