@@ -54,9 +54,10 @@ def About():
         <div class='card'>
         <p class='sub-header'>🚀 Skills & Expertise</p>
         <ul class='text'>
-        <li><b>Languages:</b> Python, C++, SQL</li>
+        <li><b>Languages:</b> Python, C++, Java, SQL</li>
         <li><b>Frameworks & Libraries:</b> Numpy, Pandas, Scikit-learn, TensorFlow, Keras, Streamlit</li>
-        <li><b>Databases & Tools:</b> MySQL, MongoDB, Git, Docker, Flask, Tableau</li>
+        <li><b>Java Full Stack:</b> HTML5, CSS, JavaScript, React.js,Core Java, Spring Boot, Servlet, JSP, JDBC, Git & GitHub, Maven, Microservices, Postman, Docker</li>
+        <li><b>Databases & Tools:</b> MySQL, MongoDB, Git, Docker, Flask, Power BI,  IntelliJ IDEA, VS Code</li>
         <li><b>Soft Skills:</b> Problem-solving, Teamwork, Effective Communication</li>
         </ul>
         </div>
